@@ -48,8 +48,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             print(self.pred_img_path)
             name = self.make_pred(model, self.pred_img_path)
-            self.label_2.setText(name)
-            self.set_inf(name)
+            if(name != "not in database"):
+                self.label_2.setText(name)
+                self.set_inf(name)
+            else:
+                self.label_2.setText(name)
         return
     def make_pred(self, model, path):
         """
@@ -76,19 +79,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         transforms = torchvision.models.EfficientNet_B1_Weights.DEFAULT.transforms()
         image_transformed = transforms(image)
         image = torch.unsqueeze(image_transformed, 0)
-        print(image.size())
         model.eval()
         with torch.inference_mode():
             prediction = model(image)
             prediction = prediction.softmax(dim=1)
-        print(animal_names[prediction.argmax(dim=1)])
+
         ind = prediction.argmax(dim=1)
 
-        print(prediction[0, prediction.argmax(dim=1)])
+
         if prediction[0, prediction.argmax(dim=1)] > 0.20:
             return animal_names[prediction.argmax(dim=1)]
         else:
-            return "not in database "
+            return "not in database"
 
 
     #
